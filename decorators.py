@@ -1,6 +1,37 @@
+import copy
 from datetime import date
 from functools import wraps
+
 from flask import request, g, render_template
+
+
+def get_permissible_entries(user, entry):
+    """
+    Function to get permissible sub-entries recursively.
+
+    :param user: The user object.
+    :type user: mod_auth.models.User
+    :param entry: The sub entry.
+    :type entry: dict
+
+    """
+    allowed_entry = copy.deepcopy(
+        entry)  # Creating a copy of entry using deepcopy (As it can also contain another dictionary, deepcopy is used.)
+    allowed_entry[
+        'entries'] = []  # Emptying the list of allowed entries. Permissible sub entries to be appended to this list and returned.
+
+    if 'entries' not in entry.keys():
+        entry['entries'] = []
+    if user.can_access_route(entry['route']):
+        for each_child in entry['entries']:
+            if 'entries' not in each_child.keys():
+                each_child['entries'] = []
+
+            permissible_entries = get_permissible_entries(user, each_child)
+            if permissible_entries != {}:
+                allowed_entry['entries'].append(permissible_entries)
+
+    return allowed_entry
 
 
 def get_menu_entries(user, title, icon, route='', all_entries=None):
@@ -34,9 +65,8 @@ def get_menu_entries(user, title, icon, route='', all_entries=None):
             passed = user.can_access_route(route)
         else:
             for entry in all_entries:
-                # TODO: make this recursive if necessary
-                if user.can_access_route(entry['route']):
-                    allowed_entries.append(entry)
+                allowed_entries.append(get_permissible_entries(user, entry))
+
             if len(allowed_entries) > 0:
                 result['entries'] = allowed_entries
                 passed = True

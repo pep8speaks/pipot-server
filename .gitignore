@@ -26,3 +26,5 @@ config.py
 
 # Generated images for the honeypots (big binary blobs)
 honeypot_images/*.img
+/.idea/misc.xml
+/.idea/pipot-server.iml
