@@ -31,6 +31,9 @@ def get_permissible_entries(user, entry):
             if permissible_entries != {}:
                 allowed_entry['entries'].append(permissible_entries)
 
+    if allowed_entry['entries'] == []:  # If there are no permissible child entries,The key 'entries' is removed.
+        allowed_entry.pop('entries')
+
     return allowed_entry
 
 
