@@ -1,6 +1,5 @@
 import json
 import os
-
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, Boolean, \
     UniqueConstraint
 from sqlalchemy.orm import relationship
@@ -24,7 +23,7 @@ class Service(Base):
 
     def get_file(self, temp_folder=False):
         return os.path.join(
-            './app/services',
+            './pipot/services',
             'temp' if temp_folder else '',
             self.name + '.py'
         )
